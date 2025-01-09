@@ -10,43 +10,50 @@ import org.robloxjava.transpiler.luau.ast.*;
 
 import java.util.*;
 
+// TODO Nested classes are WIP
+
 public final class ClassVisitor {
     public static void visit(ClassOrInterfaceDeclaration declaration, LuauGenerator luauGenerator, Optional<LuauNode> baseNode) {
-        final String className = declaration.getName().asString();
+        final boolean isNested = declaration.isInnerClass();
+        final String className = isNested ? STR."self.\{declaration.getName().asString()}" : declaration.getName().asString();
         final LuauNode nodeRoot = baseNode.orElseGet(() -> luauGenerator.luauAST);
 
-        nodeRoot.addChildNoKey(
-                new VariableDeclaration(className, new Identifier("{}")));
+        // #1 basic stuff
+        nodeRoot.addChildNoKey( isNested ? new VariableReassign(className, new Identifier("{}")) :
+                new VariableDeclaration(className, new Identifier("{}")) );
 
         nodeRoot.addChildNoKey(
                 new VariableReassign(String.format("%s.__index", className), new Identifier(className)));
 
+        // #2 constructor code
         List<ConstructorDeclaration> constructors = declaration.getConstructors();
 
         if (constructors.isEmpty()) { // there are no constructors, auto generate one
             HashMap<String, LuauNode> children = new HashMap<>();
 
-            children.put("01", new VariableDeclaration("self", new Identifier(String.format("setmetatable({}, %s)", className))));
+            final String selfName = isNested ? "_self" : "self"; // TODO
 
-            children.put("02", new ReturnStatement("self"));
+            children.put("01", new VariableDeclaration("self", new Identifier(String.format("setmetatable({}, %s)", className))));
 
             FunctionDeclaration funcDeclaration =
                     new FunctionDeclaration(String.format("%s.constructor", className), Collections.emptyList(), Optional.of(children));
 
-            declaration.accept(new VoidVisitorAdapter<>() {
-                @Override
-                public void visit(ClassOrInterfaceDeclaration n, Object arg) {
-                    if (!Objects.equals(n.getName().asString(), className))
-                        ClassVisitor.visit(n, luauGenerator, Optional.of(funcDeclaration));
-                }
 
-            }, null);
+            declaration.getChildNodes().forEach(node -> {
+                if (node instanceof ClassOrInterfaceDeclaration) {
+                    // ugly code to detect nested classes since accept does not work
+                    ClassVisitor.visit(((ClassOrInterfaceDeclaration) node).asClassOrInterfaceDeclaration(), luauGenerator, Optional.of(funcDeclaration));
+                }
+            });
+
+
+            funcDeclaration.addChildNoKey(new ReturnStatement("self"));
 
             nodeRoot.addChildNoKey(funcDeclaration);
         }
 
 
-        // add children
+        // #3 visit child nodes
 
         declaration.accept(new VoidVisitorAdapter<>() {
             @Override

@@ -1,9 +1,6 @@
 package org.robloxjava.test;
 
 public class Program {
-    class SomeNestedClass {
-
-    }
 
     public static void main(String[] args) {
         String hello = "Hello, world!";
