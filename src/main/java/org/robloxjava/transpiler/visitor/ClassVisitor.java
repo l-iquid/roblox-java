@@ -61,6 +61,7 @@ public final class ClassVisitor {
                 MethodVisitor.visit(n, luauGenerator, className, Optional.of(nodeRoot));
             }
 
+
         }, null);
 
     }
