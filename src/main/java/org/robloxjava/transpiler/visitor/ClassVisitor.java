@@ -13,56 +13,75 @@ import java.util.*;
 // TODO Nested classes are WIP
 
 public final class ClassVisitor {
+    final String selfName = "self";
+
+    // the ultimate origin
     public static void visit(ClassOrInterfaceDeclaration declaration, LuauGenerator luauGenerator, Optional<LuauNode> baseNode) {
         final boolean isNested = declaration.isInnerClass();
         final String className = isNested ? STR."self.\{declaration.getName().asString()}" : declaration.getName().asString();
-        final LuauNode nodeRoot = baseNode.orElseGet(() -> luauGenerator.luauAST);
+
+        final DoEndStatement classWrapperNode = new DoEndStatement();
+        final LuauNode baseNodeForWrapper = baseNode.orElse(luauGenerator.luauAST);
+        baseNodeForWrapper.addChildNoKey(new LuaComment(false, String.format("▼ Class definition '%s' ▼", className)));
 
         // #1 basic stuff
-        nodeRoot.addChildNoKey( isNested ? new VariableReassign(className, new Identifier("{}")) :
+
+        baseNodeForWrapper.addChildNoKey( isNested ? new VariableReassign(className, new Identifier("{}")) :
                 new VariableDeclaration(className, new Identifier("{}")) );
 
-        nodeRoot.addChildNoKey(
+        baseNodeForWrapper.addChildNoKey(classWrapperNode);
+
+        classWrapperNode.addChildNoKey(
                 new VariableReassign(String.format("%s.__index", className), new Identifier(className)));
+
+        classWrapperNode.addChildNoKey(
+                new FunctionDeclaration(String.format("%s.__tostring", className), Collections.emptyList(),
+                        Optional.of(new HashMap<>() {{
+                            put("01", new ReturnStatement(new LiteralExpression(STR."\"\{className}\"")));
+                        }}))
+        );
 
         // #2 constructor code
         List<ConstructorDeclaration> constructors = declaration.getConstructors();
 
         if (constructors.isEmpty()) { // there are no constructors, auto generate one
-            HashMap<String, LuauNode> children = new HashMap<>();
-
-            final String selfName = isNested ? "_self" : "self"; // TODO
-
-            children.put("01", new VariableDeclaration("self", new Identifier(String.format("setmetatable({}, %s)", className))));
-
-            FunctionDeclaration funcDeclaration =
-                    new FunctionDeclaration(String.format("%s.constructor", className), Collections.emptyList(), Optional.of(children));
-
-
-            declaration.getChildNodes().forEach(node -> {
-                if (node instanceof ClassOrInterfaceDeclaration) {
-                    // ugly code to detect nested classes since accept does not work
-                    ClassVisitor.visit(((ClassOrInterfaceDeclaration) node).asClassOrInterfaceDeclaration(), luauGenerator, Optional.of(funcDeclaration));
-                }
-            });
-
-
-            funcDeclaration.addChildNoKey(new ReturnStatement("self"));
-
-            nodeRoot.addChildNoKey(funcDeclaration);
+            ConstructorVisitor.visit(Optional.empty(), luauGenerator, classWrapperNode, className,
+                    Optional.ofNullable(String.format("%s.constructor", className)));
+        } else {
+            int counter = 0;
+            for (ConstructorDeclaration constructor : constructors) {
+                final String constructorName = constructors.size() < 2 ? String.format("%s.constructor", className) :
+                        String.format("%s.constructor%d", className, counter);
+                ConstructorVisitor.visit(Optional.of(constructor), luauGenerator, classWrapperNode, className,
+                        Optional.ofNullable(constructorName));
+                counter++;
+            }
         }
 
+        // #3 look for nested classes
+        declaration.getChildNodes().forEach(node -> {
+            if (node instanceof ClassOrInterfaceDeclaration) {
+                // ugly code to detect nested classes since accept does not work
+                ClassVisitor.visit(((ClassOrInterfaceDeclaration) node).asClassOrInterfaceDeclaration(), luauGenerator,
+                        Optional.of(classWrapperNode));
+            }
+        });
 
-        // #3 visit child nodes
+        // #4 visit child nodes
 
         declaration.accept(new VoidVisitorAdapter<>() {
             @Override
             public void visit(MethodDeclaration n, Object arg) {
-                MethodVisitor.visit(n, luauGenerator, className, Optional.of(nodeRoot));
+                if (!n.isConstructorDeclaration())
+                    MethodVisitor.visit(n, luauGenerator, className, Optional.of(classWrapperNode));
             }
 
 
         }, null);
+
+
+
+        baseNodeForWrapper.addChildNoKey(new LuaComment(false, String.format("▲ Class definition '%s' ▲", className)));
 
     }
 }

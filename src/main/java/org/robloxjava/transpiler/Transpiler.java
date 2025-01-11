@@ -9,6 +9,14 @@ import java.nio.file.Path;
 
 public final class Transpiler {
 
+    /**
+     * You **must** run this.
+     */
+    public static void Init() {
+        LuauGenerator.setJavaParserThings();
+    }
+
+
     public static String parseJavaFile(String path) {
         try {
             String fileContents = Files.readString(Path.of(path), StandardCharsets.UTF_8);

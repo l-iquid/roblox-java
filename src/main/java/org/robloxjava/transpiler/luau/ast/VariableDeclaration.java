@@ -13,6 +13,7 @@ public class VariableDeclaration extends LuauNode {
 
     @Override
     public String Render(int layer) {
-        return "\t".repeat(layer)+String.format("local %s = %s", variableName, variableValue.Render(layer));
+        return "\t".repeat(layer)+(variableValue == null ? String.format("local %s", variableName) :
+                String.format("local %s = %s", variableName, variableValue.Render(layer)));
     }
 }
