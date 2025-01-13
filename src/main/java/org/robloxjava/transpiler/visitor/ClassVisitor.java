@@ -2,6 +2,7 @@ package org.robloxjava.transpiler.visitor;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import org.robloxjava.transpiler.LuauGenerator;
@@ -30,6 +31,9 @@ public final class ClassVisitor {
                 new VariableDeclaration(className, new Identifier("{}")) );
 
         baseNodeForWrapper.addChildNoKey(classWrapperNode);
+
+        classWrapperNode.addChildNoKey(
+                new VariableReassign(String.format("%s.__className", className), new LiteralExpression(STR."\"\{className}\"")));
 
         classWrapperNode.addChildNoKey(
                 new VariableReassign(String.format("%s.__index", className), new Identifier(className)));
@@ -76,10 +80,20 @@ public final class ClassVisitor {
                     MethodVisitor.visit(n, luauGenerator, className, Optional.of(classWrapperNode));
             }
 
+            @Override
+            public void visit(FieldDeclaration n, Object arg) {
+                FieldVisitor.visit(n, luauGenerator, classWrapperNode, className);
+            }
 
         }, null);
 
-
+        // FYI I transported some of the ConstructorVisitor code for the FieldVisitor to work correctly
+        // run constructor code
+        for (ConstructorDeclaration constructor : constructors) {
+            VisitUtil.MethodVisitRunner(constructor, luauGenerator, classWrapperNode.children.get("__constructor"));
+        }
+        // return may appear before the fields
+        classWrapperNode.children.get("__constructor").addChildNoKey(new ReturnStatement(new Identifier("self")));
 
         baseNodeForWrapper.addChildNoKey(new LuaComment(false, String.format("▲ Class definition '%s' ▲", className)));
 

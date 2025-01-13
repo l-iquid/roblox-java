@@ -6,6 +6,7 @@ import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithParameters;
+import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import org.robloxjava.transpiler.LuauGenerator;
@@ -46,6 +47,11 @@ public class VisitUtil {
             @Override
             public void visit(ReturnStmt n, Object arg) {
                 ReturnVisitor.visit(n, luauGenerator, baseNode);
+            }
+
+            @Override
+            public void visit(IfStmt n, Object arg) {
+                IfVisitor.visit(n, luauGenerator, baseNode, false);
             }
 
             @Override

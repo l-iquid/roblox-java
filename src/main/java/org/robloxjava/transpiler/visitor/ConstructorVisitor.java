@@ -28,16 +28,13 @@ public final class ConstructorVisitor {
 
             funcDeclaration = new FunctionDeclaration(constructorName.orElse("constructor"), parameterNames, Optional.of(children));
 
-            // #3 constructor code
-            VisitUtil.MethodVisitRunner(realConstructor, luauGenerator, funcDeclaration);
-
         } else {
             funcDeclaration = new FunctionDeclaration(constructorName.orElse("constructor"), Collections.emptyList(), Optional.of(children));
         }
 
-        funcDeclaration.addChildNoKey(new ReturnStatement(new Identifier("self")));
 
-        classWrapperNode.addChildNoKey(funcDeclaration);
+        classWrapperNode.children.put("__constructor", funcDeclaration);
+
 
     }
 }

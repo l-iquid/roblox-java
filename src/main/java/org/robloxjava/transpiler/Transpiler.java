@@ -17,18 +17,25 @@ public final class Transpiler {
     }
 
 
-    public static String parseJavaFile(String path) {
+    public static final String runtimeLibLocation = "game:GetService(\"ReplicatedStorage\").__java.RuntimeLib";
+    public static final String runtimeLibName = "Java";
+
+    public static String parseJavaFile(String path, boolean coreTestingMode) {
         try {
             String fileContents = Files.readString(Path.of(path), StandardCharsets.UTF_8);
-            return parseJavaSource(fileContents);
+            return parseJavaSource(fileContents, coreTestingMode);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static String parseJavaSource(String source) {
+    public static String parseJavaSource(String source, boolean coreTestingMode) {
         LuauGenerator luauGenerator = new LuauGenerator(source);
         luauGenerator.luauAST.Render(0);
+
+        if (coreTestingMode) {
+            luauGenerator.luauWriter.writeLine("Program.main({}) -- ◀ Internal testing mode ◀");
+        }
 
         return luauGenerator.luauWriter.getLuauSource();
     }

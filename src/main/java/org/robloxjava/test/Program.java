@@ -1,37 +1,48 @@
 package org.robloxjava.test;
 
-class Animal {
+class Animal<T> {
+    private String animalName;
+    private int animalAge;
+
     public Animal(String stringA, int x) {
-        String screwYou = stringA;
+        this.animalName = stringA;
+        this.animalAge = x;
         // pretend we're printing
     }
 
-    public int getSomeThing() {
-        return 6;
+    public String getAnimalName() {
+        return this.animalName;
     }
 
-    public static int part2(String korblox) {
-        return 8;
+    public int getAnimalAge() {
+        return this.animalAge;
     }
 
 }
 
 public class Program {
+    public int r, y = 3;
+    public static int SomeStaticInt = 6;
+    public static String aTHing, b;
 
-    private static int hi() {
+    private static Object hi(int exampleValue) {
+        if (3 + 156 / 7 > exampleValue || 703 < exampleValue) {
+            return 69;
+        } else if (exampleValue == 3) {
+            int t = 3;
+        } else {
+            return "Screw you!";
+        }
         return 999;
     }
 
+    public void a() {
+        hi(3);
+    }
+
     public static void main(String[] args) {
-        int y = 800;
-        Program rrr = null;
-        Animal someOtherAnimal = new Animal("a", 5);
-        someOtherAnimal = null;
-        Animal arara = new Animal("Screw you!", 2);
-        int x = 3 + y / arara.getSomeThing();
-        Animal.part2("Hello, world!");
-
-        int theResultOfHi = Program.hi();
-
+        Animal<Integer> x = new Animal<>("Woof", 3);
+        SomeStaticInt = 6;
+        x.getAnimalAge();
     }
 }

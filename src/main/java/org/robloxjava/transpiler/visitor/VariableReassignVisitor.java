@@ -12,11 +12,16 @@ import org.robloxjava.transpiler.luau.ast.VariableDeclaration;
 import org.robloxjava.transpiler.luau.ast.VariableReassign;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 public final class VariableReassignVisitor {
 
     public static void visit(AssignExpr variable, LuauGenerator luauGenerator, LuauNode baseLuauNode) {
-        final String variableName = variable.getTarget().toString();
+        String variableName = variable.getTarget().toString();
+
+        if (variableName.contains("this.")) {
+            variableName = STR."self.\{variableName.split(Pattern.quote("."), 2)[1]}";
+        }
 
         Expression initializer = variable.getValue();
 

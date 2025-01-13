@@ -15,7 +15,7 @@ public class Main {
         Transpiler.Init();
 
         FileWriter tempOut = new FileWriter("src/main/java/org/robloxjava/tempout/TestOut.lua");
-        tempOut.write(Transpiler.parseJavaFile("src/main/java/org/robloxjava/test/Program.java"));
+        tempOut.write(Transpiler.parseJavaFile("src/main/java/org/robloxjava/test/Program.java", true));
         tempOut.close();
 
     }
