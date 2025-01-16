@@ -25,51 +25,41 @@ import java.util.regex.Pattern;
  */
 public final class StandaloneExprVisitor {
     private static LuauNode controlLoop(Node expr, LuauGenerator luauGenerator) {
-        if (expr instanceof BinaryExpr) {
-            var realExpr = ((BinaryExpr) expr).asBinaryExpr();
+        if (expr instanceof BinaryExpr realExpr) {
             return new BinaryExpression(
                     controlLoop(realExpr.getLeft(), luauGenerator),
                     controlLoop(realExpr.getRight(), luauGenerator),
                     realExpr.getOperator().asString()
             );
-
         }
-        if (expr instanceof LiteralExpr) {
-            var realExpr = ((LiteralExpr) expr).asLiteralExpr();
+
+        if (expr instanceof LiteralExpr realExpr) {
             return new LiteralExpression(expr.toString());
         }
-        if (expr instanceof NameExpr) {
-            var realExpr = ((NameExpr) expr).asNameExpr();
+        if (expr instanceof NameExpr realExpr) {
             String variableName = realExpr.toString();
             return new Identifier(variableName);
         }
-        if (expr instanceof FieldAccessExpr) {
-            var realExpr = ((FieldAccessExpr) expr).asFieldAccessExpr();
+        if (expr instanceof FieldAccessExpr realExpr) {
             String variableName = realExpr.toString();
             if (variableName.contains("this.")) {
                 variableName = STR."self.\{variableName.split(Pattern.quote("."), 2)[1]}";
             }
             return new Identifier(variableName);
         }
-        if (expr instanceof ReferenceType) {
-            var realExpr = ((ReferenceType) expr).asReferenceType();
+        if (expr instanceof ReferenceType realExpr) {
             return new Identifier(realExpr.toString());
         }
-        if (expr instanceof ObjectCreationExpr) {
-            var realExpr = ((ObjectCreationExpr) expr).asObjectCreationExpr();
+        if (expr instanceof ObjectCreationExpr realExpr) {
             final List<LuauNode> arguments = realExpr.getArguments()
                     .stream().map(param -> StandaloneExprVisitor.visit(param, luauGenerator)).toList();
             final String typeName = realExpr.getTypeAsString().split(Pattern.quote("<"), 2)[0];
             return new CallExpression(new Identifier(STR."\{typeName}.constructor"), arguments, false);
         }
-        if (expr instanceof MethodCallExpr) {
-            // todo code is a little messy
-            var realExpr = ((MethodCallExpr) expr).asMethodCallExpr();
-
+        if (expr instanceof MethodCallExpr realExpr) {
             return MethodCallVisitor.visit(realExpr, luauGenerator, false);
         }
-        if (expr instanceof InstanceOfExpr) {
-            var realExpr = ((InstanceOfExpr) expr).asInstanceOfExpr();
+        if (expr instanceof InstanceOfExpr realExpr) {
             return new BinaryExpression(
                     controlLoop(realExpr.getExpression(), luauGenerator),
                     controlLoop(realExpr.getType(), luauGenerator),

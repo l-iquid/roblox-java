@@ -32,7 +32,7 @@ public final class ClassVisitor {
 
         baseNodeForWrapper.addChildNoKey(classWrapperNode);
 
-        classWrapperNode.addChildNoKey(
+        classWrapperNode.children.put("__className",
                 new VariableReassign(String.format("%s.__className", className), new LiteralExpression(STR."\"\{className}\"")));
 
         classWrapperNode.addChildNoKey(
@@ -42,7 +42,9 @@ public final class ClassVisitor {
                 new FunctionDeclaration(String.format("%s.__tostring", className), Collections.emptyList(),
                         Optional.of(new HashMap<>() {{
                             put("01", new ReturnStatement(new LiteralExpression(STR."\"\{className}\"")));
-                        }}))
+                        }}),
+                        classWrapperNode
+                )
         );
 
         // #2 constructor code

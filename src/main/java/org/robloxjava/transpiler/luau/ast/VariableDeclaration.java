@@ -3,7 +3,7 @@ package org.robloxjava.transpiler.luau.ast;
 import org.robloxjava.transpiler.luau.LuauNode;
 
 public class VariableDeclaration extends LuauNode {
-    private final String variableName;
+    public final String variableName;
     private final LuauNode variableValue;
 
     public VariableDeclaration(String variableName, LuauNode variableValue) {

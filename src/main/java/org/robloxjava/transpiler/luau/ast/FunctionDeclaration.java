@@ -10,11 +10,13 @@ import java.util.Optional;
 public class FunctionDeclaration extends LuauNode {
     private final String functionName;
     private final List<String> parameters;
+    public DoEndStatement originClass;
 
-    public FunctionDeclaration(String functionName, List<String> parameters, Optional<HashMap<String, LuauNode>> children) {
+    public FunctionDeclaration(String functionName, List<String> parameters, Optional<HashMap<String, LuauNode>> children, DoEndStatement originClass) {
         this.functionName = functionName;
         this.parameters = parameters;
         children.ifPresent(stringLuauNodeHashMap -> this.children = stringLuauNodeHashMap);
+        this.originClass = originClass;
     }
 
     @Override

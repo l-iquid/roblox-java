@@ -3,62 +3,47 @@ local Java = require(game:GetService("ReplicatedStorage").__java.RuntimeLib)
 -- ▼ Class definition 'Animal' ▼
 local Animal = {}
 do
-	Animal.__className = "Animal"
 	Animal.__index = Animal
 	function Animal.__tostring()
 		return "Animal"
 	end
-	function Animal.constructor(stringA, x)
+	function Animal.constructor(name, age, specialInfo)
 		local self = setmetatable({}, Animal)
-		self.animalName = nil
-		self.animalAge = nil
-		self.animalName = stringA
-		self.animalAge = x
+		self.name = name
+		self.age = age
+		self.specialInfo = specialInfo
 		return self
 	end
-	function Animal:getAnimalName()
-		return self.animalName
+	function Animal:getName()
+		return self.name
 	end
-	function Animal:getAnimalAge()
-		return self.animalAge
+	function Animal:getAge()
+		return self.age
 	end
+	function Animal:getSpecialInfo()
+		return self.specialInfo
+	end
+	function Animal:setSpecialInfo(newInfo)
+		self.specialInfo = newInfo
+	end
+	Animal.__className = "Animal"
 end
 -- ▲ Class definition 'Animal' ▲
 -- ▼ Class definition 'Program' ▼
 local Program = {}
 do
-	Program.__className = "Program"
 	Program.__index = Program
 	function Program.__tostring()
 		return "Program"
 	end
 	function Program.constructor()
 		local self = setmetatable({}, Program)
-		self.r = nil
-		self.y = 3
 		return self
 	end
-	Program.SomeStaticInt = 6
-	Program.aTHing = nil
-	Program.b = nil
-	function Program.hi(exampleValue)
-		if 3 + 156 / 7 > exampleValue or 703 < exampleValue then
-			return 69
-		elseif exampleValue == 3 then
-			local t = 3
-		else
-			return "Screw you!"
-		end
-		return 999
-	end
-	function Program:a()
-		Program.hi(3)
-	end
 	function Program.main(args)
-		local x = Animal.constructor("Woof", 3)
-		SomeStaticInt = 6
-		x:getAnimalAge()
+		local x = Animal.constructor("Barkson", 4, 57)
 	end
+	Program.__className = "Program"
 end
 -- ▲ Class definition 'Program' ▲
 Program.main({}) -- ◀ Internal testing mode ◀

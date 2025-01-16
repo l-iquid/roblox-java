@@ -20,10 +20,14 @@ public final class FieldVisitor {
                     )
                 );
             } else {
+                final var varInit = variable.getInitializer();
+                if (varInit.isEmpty()) {
+                    return;
+                }
                 baseLuauNode.children.get("__constructor").addChildNoKey(
                         new VariableReassign(
                                 STR."self.\{variable.getNameAsString()}",
-                                StandaloneExprVisitor.visit(variable.getInitializer().orElse(new NullLiteralExpr()), luauGenerator)
+                                StandaloneExprVisitor.visit(varInit.get(), luauGenerator)
                         )
                 );
             }

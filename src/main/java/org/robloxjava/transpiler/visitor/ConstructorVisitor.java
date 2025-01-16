@@ -26,12 +26,13 @@ public final class ConstructorVisitor {
             // #2 constructor parameters
             final List<String> parameterNames = VisitUtil.MethodParameterNames(realConstructor);
 
-            funcDeclaration = new FunctionDeclaration(constructorName.orElse("constructor"), parameterNames, Optional.of(children));
+            funcDeclaration = new FunctionDeclaration(constructorName.orElse("constructor"), parameterNames, Optional.of(children), classWrapperNode);
 
         } else {
-            funcDeclaration = new FunctionDeclaration(constructorName.orElse("constructor"), Collections.emptyList(), Optional.of(children));
+            funcDeclaration = new FunctionDeclaration(constructorName.orElse("constructor"), Collections.emptyList(), Optional.of(children), classWrapperNode);
         }
 
+        funcDeclaration.parent = classWrapperNode;
 
         classWrapperNode.children.put("__constructor", funcDeclaration);
 

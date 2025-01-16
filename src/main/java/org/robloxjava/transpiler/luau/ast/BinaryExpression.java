@@ -16,6 +16,8 @@ public class BinaryExpression extends LuauNode {
             this.operation = "or";
         else if (Objects.equals(operation, "&&"))
             this.operation = "and";
+        else if (Objects.equals(operation, "!="))
+            this.operation = "~=";
         else
             this.operation = operation;
     }

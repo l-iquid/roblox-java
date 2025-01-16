@@ -6,6 +6,7 @@ import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithParameters;
+import com.github.javaparser.ast.stmt.AssertStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
@@ -32,6 +33,11 @@ public class VisitUtil {
             @Override
             public void visit(VariableDeclarator n, Object arg) {
                 VariableDeclVisitor.visit(n, luauGenerator, baseNode);
+            }
+
+            @Override
+            public void visit(AssertStmt n, Object arg) {
+                AssertVisitor.visit(n, luauGenerator, baseNode);
             }
 
             @Override

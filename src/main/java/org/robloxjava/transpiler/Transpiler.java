@@ -1,6 +1,8 @@
 package org.robloxjava.transpiler;
 
 
+import org.robloxjava.transpiler.transformer.JavaTransformer;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -30,6 +32,7 @@ public final class Transpiler {
     }
 
     public static String parseJavaSource(String source, boolean coreTestingMode) {
+        source = JavaTransformer.Transform(source);
         LuauGenerator luauGenerator = new LuauGenerator(source);
         luauGenerator.luauAST.Render(0);
 

@@ -26,6 +26,7 @@ import java.util.Optional;
 /**
  * The main class of the transpiler.
  * Java AST -> Luau AST.
+ * @see org.robloxjava.transpiler.transformer.JavaTransformer for hidden Java AST changes.
  */
 public class LuauGenerator {
     public static JavaParser javaParser = new JavaParser(new ParserConfiguration()
@@ -53,7 +54,7 @@ public class LuauGenerator {
             @Override
             public void visit(ClassOrInterfaceDeclaration n, Object arg) {
                 // we only want the top level declarations aka classes and interfaces
-
+                if (n.isInterface()) return;
                 ClassVisitor.visit(n, LuauGenerator.this, Optional.empty());
             }
 
