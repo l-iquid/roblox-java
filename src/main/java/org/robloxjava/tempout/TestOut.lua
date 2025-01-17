@@ -41,7 +41,9 @@ do
 		return self
 	end
 	function Program.main(args)
-		local x = Animal.constructor("Barkson", 4, 57)
+		local x = Animal.constructor("Barkson", 4, {5, 7, 9, "poopies"})
+		local y = {}
+		x:setSpecialInfo({1, 2, 3, true})
 	end
 	Program.__className = "Program"
 end

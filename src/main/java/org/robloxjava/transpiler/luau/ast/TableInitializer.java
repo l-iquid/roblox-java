@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TableInitializer extends LuauNode {
-    private final List<String> values, keys;
+    private final List<LuauNode> values, keys;
     private final boolean isArray;
 
-    public TableInitializer(List<String> values, List<String> keys, boolean isArray) {
+    public TableInitializer(List<LuauNode> values, List<LuauNode> keys, boolean isArray) {
         this.values = values;
         this.keys = keys;
         this.isArray = isArray;
@@ -20,12 +20,14 @@ public class TableInitializer extends LuauNode {
     public String Render(int layer) {
         StringBuilder retStr = new StringBuilder("{");
         if (isArray) {
-            retStr.append(LuauWriter.separateListCommas(values));
+            final ArrayList<String> vals = new ArrayList<>();
+            values.forEach(n -> vals.add(n.Render(layer)));
+            retStr.append(LuauWriter.separateListCommas(vals));
         } else {
             ArrayList<String> keyValueList = new ArrayList<>();
             int index = 0;
             for (var key : keys) {
-                keyValueList.add(STR."[\{key}] = \{values.get(index)}");
+                keyValueList.add(STR."[\{key.Render(layer)}] = \{values.get(index).Render(layer)}");
                 index++;
             }
             retStr.append(LuauWriter.separateListCommas(keyValueList));

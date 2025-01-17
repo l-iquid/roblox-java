@@ -1,5 +1,7 @@
 package org.robloxjava.test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 class Animal<T> {
@@ -32,7 +34,11 @@ class Animal<T> {
 
 public class Program {
     public static void main(String[] args) {
-        Animal<Integer> x = new Animal<>("Barkson", 4, 57);
+        Animal<Object[]> x = new Animal<>("Barkson", 4,
+                new Object[] {5, 7, 9, "poopies"});
 
+        ArrayList<Integer> y = new ArrayList<>();
+
+        x.setSpecialInfo(new Object[] {1, 2, 3, true});
     }
 }

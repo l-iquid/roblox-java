@@ -30,8 +30,6 @@ public final class JavaTransformer {
                 Node curNode = n.getParentNode().get();
                 final var nParent = n.getParentNode().get();
 
-                System.out.println("PARENT: " + nParent);
-
                 while (true) {
                     // do some checks
                     if (curNode instanceof AssignExpr realCurNode) {

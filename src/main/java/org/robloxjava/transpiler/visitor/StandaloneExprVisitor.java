@@ -40,6 +40,18 @@ public final class StandaloneExprVisitor {
             String variableName = realExpr.toString();
             return new Identifier(variableName);
         }
+        if (expr instanceof ArrayInitializerExpr realExpr) {
+            final NodeList<Expression> values = realExpr.getValues();
+            final List<LuauNode> nodes = values.stream().map(n -> StandaloneExprVisitor.visit(n, luauGenerator)).toList();
+            return new TableInitializer(nodes, null, true);
+        }
+        if (expr instanceof ArrayCreationExpr realExpr) {
+            final Optional<ArrayInitializerExpr> initializerExpr = realExpr.getInitializer();
+            return StandaloneExprVisitor.visit(
+                    initializerExpr.orElse(new ArrayInitializerExpr()),
+                    luauGenerator
+            );
+        }
         if (expr instanceof FieldAccessExpr realExpr) {
             String variableName = realExpr.toString();
             if (variableName.contains("this.")) {
@@ -54,6 +66,12 @@ public final class StandaloneExprVisitor {
             final List<LuauNode> arguments = realExpr.getArguments()
                     .stream().map(param -> StandaloneExprVisitor.visit(param, luauGenerator)).toList();
             final String typeName = realExpr.getTypeAsString().split(Pattern.quote("<"), 2)[0];
+
+            // macroing
+            if (typeName.equals("ArrayList") || typeName.equals("List")) {
+                return StandaloneExprVisitor.visit(new ArrayInitializerExpr(), luauGenerator);
+            }
+
             return new CallExpression(new Identifier(STR."\{typeName}.constructor"), arguments, false);
         }
         if (expr instanceof MethodCallExpr realExpr) {
